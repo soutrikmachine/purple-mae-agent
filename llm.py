@@ -31,7 +31,7 @@ MODEL = os.environ.get(
     "anthropic/claude-sonnet-4.6" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
 )
 TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "15"))
-MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "1024"))
+MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "512"))
 
 
 _SYSTEM_PROMPT = """You are a strategic advisor for a bargaining agent.
