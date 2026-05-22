@@ -166,6 +166,14 @@ def _coerce_state(obs: dict[str, Any]) -> GameState | None:
                 int(q) - int(s) for q, s in zip(quantities, offer_self)
             ]
 
+        # Identifiers used by strategy.py for the quasi-random seed.
+        pair_key = obs.get("pair")
+        game_index = obs.get("game_index")
+        try:
+            game_index_int = int(game_index) if game_index is not None else None
+        except (TypeError, ValueError):
+            game_index_int = None
+
         return GameState(
             role=role,
             round=round_idx,
@@ -176,6 +184,8 @@ def _coerce_state(obs: dict[str, Any]) -> GameState | None:
             quantities=[int(q) for q in quantities],
             current_offer_to_self=offer_self,
             current_offer_to_other=offer_other,
+            pair_key=str(pair_key) if pair_key is not None else None,
+            game_index=game_index_int,
         )
     except (KeyError, TypeError, ValueError) as exc:
         logger.error("Failed to parse observation: %s", exc, exc_info=True)

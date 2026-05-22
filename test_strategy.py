@@ -34,6 +34,8 @@ def _make_state(
     offer_self=None,
     offer_other=None,
     prev_self_value=None,
+    pair_key=None,
+    game_index=None,
 ):
     return GameState(
         role="row",
@@ -46,6 +48,8 @@ def _make_state(
         current_offer_to_self=list(offer_self) if offer_self is not None else None,
         current_offer_to_other=list(offer_other) if offer_other is not None else None,
         previous_self_offer_value=prev_self_value,
+        pair_key=pair_key,
+        game_index=game_index,
     )
 
 
@@ -360,6 +364,100 @@ def test_decide_parses_official_pending_offer_with_opp_key():
 
 
 # ---------------------------------------------------------------------------
+# Quasi-random property tests (Path 2)
+# ---------------------------------------------------------------------------
+
+def test_quasi_random_is_reproducible():
+    """Same (pair, game_index, round, valuations, quantities) -> same proposal,
+    every single time. This is the user's hard constraint: no true randomness.
+    """
+    state = _make_state(
+        valuations=(60, 40, 90), batna=80.0, quantities=(7, 4, 1),
+        pair_key="challenger__vs__soft", game_index=7, round_=2,
+    )
+    a1, b1, _ = strategy.propose(state)
+    a2, b2, _ = strategy.propose(state)
+    a3, b3, _ = strategy.propose(state)
+    assert a1 == a2 == a3, f"reproducibility broken: {a1} vs {a2} vs {a3}"
+    assert b1 == b2 == b3
+
+
+def test_quasi_random_varies_across_game_index():
+    """Different game_index (same valuations) should sometimes produce
+    different allocations. If it never varies, our quasi-random isn't
+    creating a mixed strategy for MENE.
+    """
+    # Pick valuations where ties / multiple candidates are likely.
+    val = (50, 50, 50)  # all items equally priced -> multiple tied permutations
+    quantities = (4, 4, 4)
+    batna = 100.0
+
+    seen = set()
+    for game_idx in range(30):
+        state = _make_state(
+            valuations=val, batna=batna, quantities=quantities,
+            pair_key="challenger__vs__nfsp", game_index=game_idx, round_=1,
+        )
+        a, _, _ = strategy.propose(state)
+        seen.add(tuple(a))
+    # With 30 game indices and 4 candidate allocations, we expect at least 2
+    # distinct allocations to appear. (With pure determinism we'd see 1.)
+    assert len(seen) >= 2, (
+        f"quasi-random produced only one allocation across 30 game_indices: {seen}"
+    )
+
+
+def test_quasi_random_still_satisfies_M2_across_games():
+    """Sweep: every quasi-random candidate across many game_indices must
+    still satisfy M2 (self-value > BATNA). The mixed strategy must not break
+    any invariant.
+    """
+    rng = random.Random(99)
+    for trial in range(80):
+        T = rng.randint(2, 4)
+        quantities = [rng.randint(1, 8) for _ in range(T)]
+        valuations = [rng.randint(1, 100) for _ in range(T)]
+        max_v = sum(q * v for q, v in zip(quantities, valuations))
+        batna = rng.uniform(0, max_v * 0.7)
+        # Sweep across game_indices.
+        for game_idx in range(5):
+            state = _make_state(
+                valuations=valuations, batna=batna, quantities=quantities,
+                pair_key=f"pair_{trial}", game_index=game_idx,
+                round_=rng.randint(1, 5),
+            )
+            a_self, a_other, _ = strategy.propose(state)
+            self_v = sum(a * v for a, v in zip(a_self, valuations))
+            assert self_v >= batna + 1.0 - 1e-9, (
+                f"M2 broken trial={trial} game_idx={game_idx}: "
+                f"self_v={self_v} batna={batna}"
+            )
+            # Conservation.
+            for i in range(T):
+                assert a_self[i] + a_other[i] == quantities[i]
+
+
+def test_quasi_random_preserves_M1_across_rounds_same_game():
+    """Within one game, the M1 anchor must still bind even with quasi-random
+    candidate selection."""
+    state_r1 = _make_state(
+        valuations=(60, 40, 90), batna=80.0, quantities=(7, 4, 1),
+        pair_key="px", game_index=3, round_=1,
+    )
+    a1, _, _ = strategy.propose(state_r1)
+    v1 = sum(a * v for a, v in zip(a1, [60, 40, 90]))
+
+    state_r2 = _make_state(
+        valuations=(60, 40, 90), batna=80.0, quantities=(7, 4, 1),
+        pair_key="px", game_index=3, round_=2,
+        prev_self_value=v1,
+    )
+    a2, _, _ = strategy.propose(state_r2)
+    v2 = sum(a * v for a, v in zip(a2, [60, 40, 90]))
+    assert v2 >= v1 - 1e-9, f"M1 broken: r1={v1} r2={v2}"
+
+
+# ---------------------------------------------------------------------------
 # Test runner
 # ---------------------------------------------------------------------------
 
@@ -379,6 +477,10 @@ def run_all():
         test_m1_anchor_persists_across_rounds,
         test_m1_resets_between_games,
         test_decide_parses_official_pending_offer_with_opp_key,
+        test_quasi_random_is_reproducible,
+        test_quasi_random_varies_across_game_index,
+        test_quasi_random_still_satisfies_M2_across_games,
+        test_quasi_random_preserves_M1_across_rounds_same_game,
     ]
     failures = 0
     for t in tests:
