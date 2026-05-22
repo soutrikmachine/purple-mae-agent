@@ -28,10 +28,10 @@ USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("1", "true", "yes")
 PROVIDER = os.environ.get("LLM_PROVIDER", "openrouter").lower()
 MODEL = os.environ.get(
     "LLM_MODEL",
-    "google/gemini-3-flash-preview" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
+    "anthropic/claude-sonnet-4.6" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
 )
 TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "15"))
-MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "512"))
+MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "1024"))
 
 
 _SYSTEM_PROMPT = """You are a strategic advisor for a bargaining agent.

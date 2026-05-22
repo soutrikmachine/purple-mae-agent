@@ -207,7 +207,7 @@ A full benchmark with `games=50` produces ~2 000 A2A calls to our agent
 | Mode | Wall time | Cost |
 |---|---|---|
 | Pure-strategy (default) | 5–10 min | **$0** |
-| OpenRouter `google/gemini-3-flash-preview` | ~30–50 min | ~$0.30 |
+| OpenRouter `anthropic/claude-sonnet-4.6` | ~30–50 min | ~$0.30 |
 | OpenRouter `openai/gpt-4o-mini` | ~30–60 min | ~$0.40 |
 | OpenRouter `deepseek/deepseek-chat` | ~30–60 min | ~$0.80 |
 | OpenRouter `anthropic/claude-haiku-4.5` | ~30–60 min | ~$3.50 |
@@ -262,7 +262,7 @@ Agent card: `http://localhost:9009/.well-known/agent-card.json`.
 cp sample.env .env
 # Edit .env:
 #   USE_LLM=true
-#   LLM_MODEL=google/gemini-3-flash-preview
+#   LLM_MODEL=anthropic/claude-sonnet-4.6
 #   OPENROUTER_API_KEY=sk-or-v1-...
 python main.py
 ```
@@ -304,7 +304,7 @@ docker push rimodock/purple-mae-agent:latest
 | `OPENING_AGGRESSIVENESS` | `0.75` | Lower → more welfare; higher → more BATNA-protective |
 | `USE_LLM` | `false` | Enable LLM refinement |
 | `LLM_PROVIDER` | `openrouter` | Or `anthropic` |
-| `LLM_MODEL` | `google/gemini-3-flash-preview` | Any OpenRouter model id |
+| `LLM_MODEL` | `anthropic/claude-sonnet-4.6` | Any OpenRouter model id |
 | `LLM_TIMEOUT_S` | `15` | Per-call timeout, sec |
 | `USE_RL` | `false` | Enable RL proposer (stub currently) |
 | `RL_ALGO` | `nfsp` | Or `rnad` |

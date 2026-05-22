@@ -163,7 +163,7 @@ def main() -> None:
     use_llm = os.environ.get("USE_LLM", "false").lower() in ("1", "true", "yes")
     use_rl = os.environ.get("USE_RL", "false").lower() in ("1", "true", "yes")
     provider = os.environ.get("LLM_PROVIDER", "openrouter")
-    model = os.environ.get("LLM_MODEL", "google/gemini-3-flash-preview")
+    model = os.environ.get("LLM_MODEL", "anthropic/claude-sonnet-4.6")
     opening_aggro = os.environ.get("OPENING_AGGRESSIVENESS", "0.75")
     if use_llm:
         key_env = "OPENROUTER_API_KEY" if provider == "openrouter" else "ANTHROPIC_API_KEY"
