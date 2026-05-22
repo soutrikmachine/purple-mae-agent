@@ -1,0 +1,13 @@
+# Legacy AgentBeats descriptor. The authoritative submission file is
+# amber-manifest.json5; this exists only for backward compatibility with
+# pre-Amber tooling.
+
+name = "purple-mae-negotiator"
+description = "Hybrid deterministic + optional LLM/RL negotiator for the MAizeBargAIn meta-game evaluator."
+version = "0.2.0"
+agent_type = "purple"
+domain = "bargaining"
+
+[runtime]
+entrypoint = "python main.py"
+port = 9009

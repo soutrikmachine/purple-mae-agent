@@ -1,0 +1,62 @@
+{
+  "manifest_version": "0.1.0",
+  "program": {
+    "image": "rimodock/purple-mae-agent:latest",
+    "entrypoint": "python main.py --host 0.0.0.0 --port 9009",
+    "network": {
+      "endpoints": [
+        { "name": "a2a", "port": 9009 }
+      ]
+    },
+    "env": {
+      "PYTHONUNBUFFERED": "1",
+      "PORT": "9009",
+
+      // --- Strategy knob ---
+      // 0.75 is the empirical welfare/regret sweet spot from leaderboard analysis.
+      // 0.60 = more welfare-friendly, 0.90 = more BATNA-protective.
+      "OPENING_AGGRESSIVENESS": "0.75",
+
+      // --- LLM refinement (optional) ---
+      // USE_LLM=false (default): pure deterministic strategy, no API calls, $0 cost.
+      // USE_LLM=true: layer LLM refinement on top (clamped by M1-M5 sanitisers).
+      "USE_LLM": "false",
+      "LLM_PROVIDER": "openrouter",
+      "LLM_MODEL": "google/gemini-2.0-flash",
+      "LLM_TIMEOUT_S": "15",
+      "OPENROUTER_API_KEY": "${config.openrouter_api_key}",
+
+      // --- RL refinement (optional, advanced) ---
+      // USE_RL=false (default): no RL proposer, no extra deps.
+      // USE_RL=true: load NFSP/RNAD checkpoint from RL_CHECKPOINT_PATH and use
+      //              it as an alternate proposer (negotiator picks higher-value).
+      // Currently a stub - real OpenSpiel integration TBD; see rl_proposer.py.
+      "USE_RL": "false",
+      "RL_ALGO": "nfsp",
+      "RL_CHECKPOINT_PATH": ""
+    }
+  },
+  "config_schema": {
+    "type": "object",
+    "properties": {
+      "openrouter_api_key": {
+        "type": "string",
+        "title": "OpenRouter API Key (required only if USE_LLM=true)",
+        "secret": true
+      }
+    },
+    // Empty for the default pure-strategy submission (USE_LLM=false).
+    // Switch to ["openrouter_api_key"] when flipping USE_LLM=true so Amber
+    // refuses to start without a key.
+    "required": []
+  },
+  "provides": {
+    "a2a": {
+      "kind": "a2a",
+      "endpoint": "a2a"
+    }
+  },
+  "exports": {
+    "a2a": "a2a"
+  }
+}

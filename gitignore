@@ -1,0 +1,73 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / build
+build/
+dist/
+*.egg-info/
+*.egg
+wheels/
+.eggs/
+.installed.cfg
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+.python-version
+uv.lock-journal
+
+# --- Testing & coverage ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# --- Type checkers / linters ---
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.dmypy.json
+
+# --- Secrets & local config ---
+.env
+.env.*
+!sample.env
+*.pem
+*.key
+secrets/
+
+# --- IDE / editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Build / runtime artifacts ---
+*.log
+docker-build.log
+
+# --- Project-specific ---
+runs/
+logs/
+*.local.json
+scratch/
+
+# --- RL checkpoints (large, do not commit) ---
+# Pull from the green-agent repo when integrating real RL.
+*.pt
+*.pkl
+rl_checkpoints/

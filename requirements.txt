@@ -1,0 +1,11 @@
+# A2A SDK: must be 0.3.x. The 1.0 release removed A2AStarletteApplication and
+# is incompatible with the green agent's protocol_version=0.3.0.
+a2a-sdk[http-server]>=0.3.0,<1.0.0
+
+uvicorn>=0.30
+starlette>=0.37
+
+# OpenAI SDK is used as a provider-agnostic client (works with OpenRouter,
+# direct Anthropic, OpenAI, Together, Groq, etc. via base_url override).
+# Required only when USE_LLM=true.
+openai>=1.40.0
