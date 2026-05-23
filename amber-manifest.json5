@@ -15,7 +15,7 @@
       // --- Strategy knob ---
       // 0.75 is the empirical welfare/regret sweet spot from leaderboard analysis.
       // 0.60 = more welfare-friendly, 0.90 = more BATNA-protective.
-      "OPENING_AGGRESSIVENESS": "0.85",
+      "OPENING_AGGRESSIVENESS": "0.80",
 
       // --- LLM refinement (optional) ---
       // USE_LLM=false (default): pure deterministic strategy, no API calls, $0 cost.
