@@ -20,7 +20,7 @@
       // --- LLM refinement (optional) ---
       // USE_LLM=false (default): pure deterministic strategy, no API calls, $0 cost.
       // USE_LLM=true: layer LLM refinement on top (clamped by M1-M5 sanitisers).
-      "USE_LLM": "true",
+      "USE_LLM": "false",
       "LLM_PROVIDER": "openrouter",
       "LLM_MODEL": "anthropic/claude-sonnet-4.6",
       "LLM_TIMEOUT_S": "15",
@@ -48,7 +48,7 @@
     // Empty for the default pure-strategy submission (USE_LLM=false).
     // Switch to ["openrouter_api_key"] when flipping USE_LLM=true so Amber
     // refuses to start without a key.
-    "required": ["openrouter_api_key"]
+    "required": []
   },
   "provides": {
     "a2a": {
