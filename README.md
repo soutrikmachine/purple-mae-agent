@@ -368,6 +368,7 @@ executed during development, not predictions. Submitted via Amber to
 | Pure v2 | 0.75 | off | v1 + quasi-random candidate selection |
 | Sonnet v2 (1) | 0.75 | Sonnet 4.6 | v2 + LLM refinement |
 | Sonnet v2 (2) | 0.80 | Sonnet 4.6 | v2 + LLM, more aggressive opening |
+| Sonnet_Decide v2 (3) | 0.80 | Sonnet 4.6 | v2+LLM as decider only |
 | Pure v2 (α=0.80) | 0.80 | off | v2 deterministic, more aggressive opening |
 
 ### Headline numbers
@@ -379,6 +380,7 @@ executed during development, not predictions. Submitted via Amber to
 | Pure v2 (α=0.75) | 7.357e-6 | 12.15 | 68.31 | **31.59** | 77.13 |
 | Sonnet v2 (α=0.75) | 6.876e-6 | 14.49 | 68.62 | 22.43 | 80.65 |
 | **Sonnet v2 (α=0.80)** | **4.515e-6** ⭐ | 13.67 | 67.81 | 24.03 | **82.11** |
+| **Sonnet_Decide v2 (α=0.80)** | 8.38e-6 | 16.16 | 69.34 | **34.27** ⭐ | 81.30 |
 | Pure v2 (α=0.80) | 9.329e-6 | 11.34 | 63.61 | 25.52 | 79.13 |
 
 Final shipping config: **Sonnet v2 at α=0.80**, which held the #1 spot on
