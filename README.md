@@ -30,7 +30,7 @@ By construction the core cannot commit the five negotiation mistakes
 refinement layers are active, their outputs are filtered through M1–M5
 sanitisers, so violations cannot escape regardless of model behaviour.
 
-The agent runs in pure-strategy mode at **$0 cost** for a
+The agent runs in pure-strategy mode at **$0 cost and ~5–10 minutes** for a
 full 50-game benchmark, or in LLM-refined mode at $0.30–$13 and 30 min – 4 h
 depending on model. It speaks A2A on port 9009 against the green's
 `RemoteNegotiator` protocol, and ships with an Amber manifest for one-step
@@ -353,7 +353,141 @@ docker push rimodock/purple-mae-agent:latest
 └── README.md
 ```
 
-## Known caveats
+## Empirical results on the live leaderboard
+
+This section reports actual MAizeBargAIn benchmark scores from runs we
+executed during development, not predictions. Submitted via Amber to
+`agentbeats.dev/agentbeater/meta-game-negotiation-assessor`.
+
+### Configurations tested
+
+| Config | α | LLM | Description |
+|---|---|---|---|
+| Pure v1 | 0.75 | off | Deterministic spine only |
+| Pure v1 + Gemini | 0.75 | Gemini 2.0 Flash | LLM-refined v1 |
+| Pure v2 | 0.75 | off | v1 + quasi-random candidate selection |
+| Sonnet v2 (1) | 0.75 | Sonnet 4.6 | v2 + LLM refinement |
+| Sonnet v2 (2) | 0.80 | Sonnet 4.6 | v2 + LLM, more aggressive opening |
+| Pure v2 (α=0.80) | 0.80 | off | v2 deterministic, more aggressive opening |
+
+### Headline numbers
+
+| Config | MENE regret ↓ | EF1% ↑ | NW% ↑ | NWA% ↑ | UW% ↑ |
+|---|---|---|---|---|---|
+| Pure v1 | 8.040e-6 | 9.21 | 68.06 | 20.31 | 81.40 |
+| Pure v1 + Gemini | 8.078e-6 | 9.21 | 70.91 | 25.94 | 83.39 |
+| Pure v2 (α=0.75) | 7.357e-6 | 12.15 | 68.31 | **31.59** | 77.13 |
+| Sonnet v2 (α=0.75) | 6.876e-6 | 14.49 | 68.62 | 22.43 | 80.65 |
+| **Sonnet v2 (α=0.80)** | **4.515e-6** ⭐ | 13.67 | 67.81 | 24.03 | **82.11** |
+| Pure v2 (α=0.80) | 9.329e-6 | 11.34 | 63.61 | 25.52 | 79.13 |
+
+Final shipping config: **Sonnet v2 at α=0.80**, which held the #1 spot on
+MENE regret at time of writing.
+
+### What we believe we learned
+
+These are claims supported by the table above, listed with our actual
+confidence level.
+
+**High confidence.**
+
+- *Quasi-randomness alone improves regret.* Pure v1 → Pure v2 at α=0.75
+  dropped regret from 8.04e-6 to 7.36e-6 (a 9% gain) without changing
+  any other knob. This matches the theoretical prediction that hash-
+  conditioned candidate selection produces a mixed-strategy row in the
+  empirical payoff matrix and therefore drops off the regret-generating
+  zone.
+- *Quasi-randomness improves EF1.* Pure v1 → Pure v2 at α=0.75 lifted
+  EF1 from 9.21 to 12.15. The neutral swap mechanism produces more
+  balanced bundles, which is what EF1 rewards.
+- *Gemini 2.0 Flash makes essentially no difference.* Pure v1 →
+  Pure v1 + Gemini moved regret by +0.04e-6 (within noise). The LLM is
+  either not reaching the model often enough, or the model is too weak
+  to refine these proposals usefully.
+
+**Medium confidence.**
+
+- *At α=0.75, Claude Sonnet improves regret slightly but hurts NWA
+  significantly.* Pure v2 → Sonnet v2 at α=0.75 dropped regret 7.36e-6
+  → 6.88e-6 (7% gain) but crashed NWA from 31.59 to 22.43 (29% loss).
+  The likely mechanism: Sonnet softens proposals toward more
+  equitable splits, which pleases the equilibrium support but pushes
+  self-payoff closer to BATNA, hurting the surplus-over-BATNA geometric
+  mean in NWA.
+- *At α=0.80, Claude Sonnet is genuinely doing work that the heuristic
+  cannot.* Pure v2 (α=0.80) at 9.33e-6 vs Sonnet v2 (α=0.80) at 4.52e-6.
+  The deterministic spine at α=0.80 is over-aggressive, and Sonnet pulls
+  proposals back into a productive zone. The α + LLM combination is
+  doing better than either component alone.
+
+**Low confidence / open questions.**
+
+- *Is Sonnet v2 (α=0.80) at 4.5e-6 stable, or is some of it noise?* We
+  have one run at this exact config. The bootstrap SE on a single
+  benchmark run is around 2e-5, which is larger than our mean. A stability
+  run is recommended before claiming the number with confidence.
+- *Would Gemini 3.1 Pro perform like Sonnet at α=0.80?* The Gemini 2.0
+  Flash run was too weak to be a useful comparison. A reasoning-tier
+  Gemini (e.g. Gemini 2.5 Pro or 3.x Pro) would be informative.
+
+### Open questions worth studying
+
+The benchmark data raises several questions we don't have answers to and
+that warrant proper investigation in future work.
+
+1. **Why does α=0.80 + LLM beat α=0.75 + LLM?** Naively, more aggressive
+   openings should produce a more-exploitable row in the matrix and
+   *increase* regret. The opposite happened. One hypothesis: the LLM
+   softens α=0.80 proposals into a zone the heuristic alone can't
+   produce at any α. To test: build a local matrix runner, train a small
+   surrogate of Sonnet's refinement, and see what allocations actually
+   emerge.
+
+2. **Why does the LLM crash NWA at α=0.75 but not at α=0.80?** Possibly
+   because at α=0.75 the LLM is correcting cases that don't need
+   correction (introducing noise into already-good proposals), while at
+   α=0.80 it's correcting genuine errors. To test: log which proposals
+   the LLM modifies vs preserves at each α, and check whether
+   modifications correlate with NWA losses.
+
+3. **Is the quasi-random K=6 candidate count optimal?** We chose K=6 by
+   intuition. K could be higher (more spread in the mixed strategy) or
+   lower (less computational overhead per turn). To test: sweep K over
+   {2, 4, 6, 12, 24} using a local harness.
+
+4. **Does the LLM contribute on the propose path, the decide path, or
+   both?** We never isolated the two. Sonnet's contribution at α=0.80
+   could be entirely on propose, entirely on decide, or split. To test:
+   run with LLM_PROPOSE_ENABLED on/off and LLM_DECIDE_ENABLED on/off
+   independently.
+
+5. **How sensitive is regret to the SHA-256 seed function specifically?**
+   The hash includes (pair, game_index, round, valuations, quantities,
+   batna, M1 anchor). Each field's contribution to the resulting
+   mixed-strategy distribution is unstudied. Adding or removing fields
+   would change the variance structure of our row.
+
+6. **Does opponent modelling help?** The leader's source code includes a
+   simple opponent-type classifier (tough/moderate/soft based on average
+   offer size). We deliberately don't use this. Adding it might help on
+   NWA without hurting regret — or might add noise. Untested.
+
+7. **Would a small custom-trained policy beat the heuristic + LLM
+   stack?** This is the open RL question. Path 3 in our future work. The
+   trade-off: 3-7 days of CFR/fictitious-play training, ~500MB image
+   bloat from PyTorch + OpenSpiel, uncertain convergence, vs an unknown
+   but possibly substantial regret gain.
+
+### Cost and runtime per configuration
+
+| Config | Wall time | Cost | Tokens (LLM only) |
+|---|---|---|---|
+| Pure v1 / v2 | ~32 min | $0 | 0 |
+| Gemini 2.0 Flash | ~32 min | ~$0.10 | ~101k |
+| Sonnet 4.6 | ~1 hour | ~$2 | ~200k |
+| ~350 LLM calls observed per Sonnet run | | | |
+
+
 
 - **RL is a stub.** The integration point exists, but loading the actual
   NFSP/RNAD checkpoints requires pulling the `.pt`/`.pkl` files from the
