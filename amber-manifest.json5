@@ -26,6 +26,21 @@
       "LLM_TIMEOUT_S": "15",
       "OPENROUTER_API_KEY": "${config.openrouter_api_key}",
 
+      // --- Path A: asymmetric LLM gating ---
+      // Each path defaults to USE_LLM if unset. Override one to "false" to
+      // isolate the LLM's effect on the other path.
+      //
+      //   To test "LLM on decide only" (Path A as proposed):
+      //     LLM_PROPOSE_ENABLED=false, LLM_DECIDE_ENABLED=true
+      //   To test "LLM on propose only" (Path A inverse):
+      //     LLM_PROPOSE_ENABLED=true,  LLM_DECIDE_ENABLED=false
+      //
+      // Empirical results so far suggest the LLM softens proposals in ways
+      // that hurt NWA; gating it to the decide path may preserve regret
+      // wins while letting the deterministic spine drive welfare metrics.
+      "LLM_PROPOSE_ENABLED": "false",
+      "LLM_DECIDE_ENABLED": "true",
+
       // --- RL refinement (optional, advanced) ---
       // USE_RL=false (default): no RL proposer, no extra deps.
       // USE_RL=true: load NFSP/RNAD checkpoint from RL_CHECKPOINT_PATH and use
