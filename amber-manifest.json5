@@ -39,7 +39,7 @@
       // that hurt NWA; gating it to the decide path may preserve regret
       // wins while letting the deterministic spine drive welfare metrics.
       "LLM_PROPOSE_ENABLED": "true",
-      "LLM_DECIDE_ENABLED": "true",
+      "LLM_DECIDE_ENABLED": "false",
 
       // --- RL refinement (optional, advanced) ---
       // USE_RL=false (default): no RL proposer, no extra deps.
