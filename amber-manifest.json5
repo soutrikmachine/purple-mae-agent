@@ -38,7 +38,7 @@
       // Empirical results so far suggest the LLM softens proposals in ways
       // that hurt NWA; gating it to the decide path may preserve regret
       // wins while letting the deterministic spine drive welfare metrics.
-      "LLM_PROPOSE_ENABLED": "false",
+      "LLM_PROPOSE_ENABLED": "true",
       "LLM_DECIDE_ENABLED": "true",
 
       // --- RL refinement (optional, advanced) ---
