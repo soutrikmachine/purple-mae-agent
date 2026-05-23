@@ -34,7 +34,7 @@ EXPECTED_OPPONENT_VAL_PER_UNIT = 50.5
 # Welfare/regret trade-off knob. Round-1 aspiration ceiling is
 #     OPENING_AGGRESSIVENESS * max_attainable + (1 - it) * (BATNA + 1)
 # Empirical sweet spot from the leaderboard: 0.75 (welfare-friendly, low regret).
-OPENING_AGGRESSIVENESS = float(os.environ.get("OPENING_AGGRESSIVENESS", "0.75"))
+OPENING_AGGRESSIVENESS = float(os.environ.get("OPENING_AGGRESSIVENESS", "0.80"))
 
 
 @dataclass
