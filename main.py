@@ -165,6 +165,15 @@ def main() -> None:
     provider = os.environ.get("LLM_PROVIDER", "openrouter")
     model = os.environ.get("LLM_MODEL", "anthropic/claude-opus-4.7")
     opening_aggro = os.environ.get("OPENING_AGGRESSIVENESS", "0.80")
+    # Path A path-specific gates (default to USE_LLM if unset).
+    # Same parser as llm.py: empty string ("") means "inherit USE_LLM".
+    def _path_flag(name: str, default: bool) -> bool:
+        raw = os.environ.get(name, "")
+        if raw == "":
+            return default
+        return raw.strip().lower() in ("1", "true", "yes")
+    llm_propose = _path_flag("LLM_PROPOSE_ENABLED", use_llm)
+    llm_decide = _path_flag("LLM_DECIDE_ENABLED", use_llm)
     if use_llm:
         key_env = "OPENROUTER_API_KEY" if provider == "openrouter" else "ANTHROPIC_API_KEY"
         if not os.environ.get(key_env):
@@ -173,8 +182,10 @@ def main() -> None:
                 key_env,
             )
     logger.info(
-        "Starting Purple MAE Agent at %s (LLM=%s/%s/%s, RL=%s, aggressiveness=%s)",
-        base_url, use_llm, provider, model, use_rl, opening_aggro,
+        "Starting Purple MAE Agent at %s "
+        "(LLM=%s/%s/%s, propose=%s, decide=%s, RL=%s, aggressiveness=%s)",
+        base_url, use_llm, provider, model,
+        llm_propose, llm_decide, use_rl, opening_aggro,
     )
 
     executor = PurpleMAEExecutor()
