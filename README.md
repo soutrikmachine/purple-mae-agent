@@ -30,11 +30,9 @@ By construction the core cannot commit the five negotiation mistakes
 refinement layers are active, their outputs are filtered through M1–M5
 sanitisers, so violations cannot escape regardless of model behaviour.
 
-The agent runs in pure-strategy mode at **$0 cost and ~5–10 minutes** for a
-full 50-game benchmark, or in LLM-refined mode at $0.30–$13 and 30 min – 4 h
-depending on model. It speaks A2A on port 9009 against the green's
-`RemoteNegotiator` protocol, and ships with an Amber manifest for one-step
-submission to the AgentBeats leaderboard.
+The agent runs in pure-strategy mode or in LLM-refined mode. 
+It speaks A2A on port 9009 against the green's `RemoteNegotiator` protocol, 
+and ships with an Amber manifest for one-step submission to the AgentBeats leaderboard.
 
 ---
 
@@ -206,13 +204,12 @@ A full benchmark with `games=50` produces ~2 000 A2A calls to our agent
 
 | Mode | Wall time | Cost |
 |---|---|---|
-| Pure-strategy (default) | 5–10 min | **$0** |
-| OpenRouter `anthropic/claude-opus-4.7` | ~30–50 min | ~$0.30 |
-| OpenRouter `openai/gpt-4o-mini` | ~30–60 min | ~$0.40 |
+| Pure-strategy (default) | ~30-40 min | **$0** |
+| OpenRouter `anthropic/claude-opus-4.7` | ~30–50 min | ~$4.0 |
+| OpenRouter `google/gemini-3-flash-preview` | ~30–60 min | ~$0.60 |
 | OpenRouter `deepseek/deepseek-chat` | ~30–60 min | ~$0.80 |
-| OpenRouter `anthropic/claude-haiku-4.5` | ~30–60 min | ~$3.50 |
-| OpenRouter `anthropic/claude-sonnet-4` | ~1.5–2.5 h | ~$8 |
-| OpenRouter `anthropic/claude-opus-4.7` | ~3–4 h | ~$13 |
+| OpenRouter `anthropic/claude-sonnet-4` | ~60-80 min | ~$2 |
+
 
 Cost is linear in `games`. Use `games=10` for fast iteration during development.
 
@@ -368,7 +365,10 @@ executed during development, not predictions. Submitted via Amber to
 | Pure v2 | 0.75 | off | v1 + quasi-random candidate selection |
 | Sonnet v2 (1) | 0.75 | Sonnet 4.6 | v2 + LLM refinement |
 | Sonnet v2 (2) | 0.80 | Sonnet 4.6 | v2 + LLM, more aggressive opening |
+| Opus v2 (1) | 0.80 | Opus 4.7 | v2+ LLM, comparing LLM reasoning ability with pure game theoretic setting |
 | Sonnet_Decide v2 (3) | 0.80 | Sonnet 4.6 | v2+LLM as decider only |
+| Opus_Decide v2 (2) | 0.80 | Opus 4.7 | v2+LLM as decider only, compare with Sonnet |
+| Sonnet_Propose v2 (4) | 0.80 | Sonnet 4.6 | v2+ LLM as propose only |
 | Pure v2 (α=0.80) | 0.80 | off | v2 deterministic, more aggressive opening |
 
 ### Headline numbers
@@ -380,7 +380,10 @@ executed during development, not predictions. Submitted via Amber to
 | Pure v2 (α=0.75) | 7.357e-6 | 12.15 | 68.31 | **31.59** | 77.13 |
 | Sonnet v2 (α=0.75) | 6.876e-6 | 14.49 | 68.62 | 22.43 | 80.65 |
 | **Sonnet v2 (α=0.80)** | **4.515e-6** ⭐ | 13.67 | 67.81 | 24.03 | **82.11** |
+| Opus v2 (α=0.80) | Value | Value | Value | Value | Value |
 | **Sonnet_Decide v2 (α=0.80)** | 8.38e-6 | 16.16 | 69.34 | **34.27** ⭐ | 81.30 |
+| Opus_Decide v2 (α=0.80) | Value | Value | Value | Value | Value |
+| Sonnet_Propose (α=0.80) | 7.58e-6 | 12.47 | 70.73 | 22.83 | **82.99** |
 | Pure v2 (α=0.80) | 9.329e-6 | 11.34 | 63.61 | 25.52 | 79.13 |
 
 Final shipping config: **Sonnet v2 at α=0.80**, which held the #1 spot on
