@@ -371,7 +371,7 @@ executed during development, not predictions. Submitted via Amber to
 | Sonnet_Propose v2 (4) | 0.80 | Sonnet 4.6 | v2+ LLM as propose only. cost effective |
 | Pure v2 (α=0.80) | 0.80 | off | v2 deterministic, more aggressive opening |
 
-### Headline numbers
+### Evaluations
 
 | Config | MENE regret ↓ | EF1% ↑ | NW% ↑ | NWA% ↑ | UW% ↑ |
 |---|---|---|---|---|---|
@@ -380,7 +380,6 @@ executed during development, not predictions. Submitted via Amber to
 | Pure v2 (α=0.75) | 7.357e-6 | 12.15 | 68.31 | **31.59** | 77.13 |
 | Sonnet v2 (α=0.75) | 6.876e-6 | 14.49 | 68.62 | 22.43 | 80.65 |
 | **Sonnet v2 (α=0.80)** | **4.515e-6** ⭐ | 13.67 | 67.81 | 24.03 | **82.11** |
-| Opus v2 (α=0.80) | Value | Value | Value | Value | Value |
 | **Sonnet_Decide v2 (α=0.80)** | 8.38e-6 | 16.16 | 69.34 | **34.27** ⭐ | 81.30 |
 | **Opus_Decide v2 (α=0.80)** | 8.94e-6 | **19.85** | **71.66** | **36.6** ⭐ | 80.9 |
 | Sonnet_Propose (α=0.80) | 7.58e-6 | 12.47 | 70.73 | 22.83 | **82.99** |
