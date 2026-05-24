@@ -163,7 +163,7 @@ def main() -> None:
     use_llm = os.environ.get("USE_LLM", "false").lower() in ("1", "true", "yes")
     use_rl = os.environ.get("USE_RL", "false").lower() in ("1", "true", "yes")
     provider = os.environ.get("LLM_PROVIDER", "openrouter")
-    model = os.environ.get("LLM_MODEL", "anthropic/claude-sonnet-4.6")
+    model = os.environ.get("LLM_MODEL", "anthropic/claude-opus-4.7")
     opening_aggro = os.environ.get("OPENING_AGGRESSIVENESS", "0.75")
     # Path A path-specific gates (default to USE_LLM if unset).
     llm_propose_raw = os.environ.get("LLM_PROPOSE_ENABLED", str(use_llm).lower())
