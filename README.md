@@ -394,46 +394,108 @@ MENE regret at time of writing.
 These are claims supported by the table above, listed with our actual
 confidence level.
 
-**High confidence.**
+High confidence.
 
-- *Quasi-randomness alone improves regret.* Pure v1 → Pure v2 at α=0.75
-  dropped regret from 8.04e-6 to 7.36e-6 (a 9% gain) without changing
-  any other knob. This matches the theoretical prediction that hash-
-  conditioned candidate selection produces a mixed-strategy row in the
-  empirical payoff matrix and therefore drops off the regret-generating
-  zone.
-- *Quasi-randomness improves EF1.* Pure v1 → Pure v2 at α=0.75 lifted
-  EF1 from 9.21 to 12.15. The neutral swap mechanism produces more
-  balanced bundles, which is what EF1 rewards.
-- *Gemini 2.0 Flash makes essentially no difference.* Pure v1 →
-  Pure v1 + Gemini moved regret by +0.04e-6 (within noise). The LLM is
-  either not reaching the model often enough, or the model is too weak
-  to refine these proposals usefully.
+Quasi-randomness alone improves regret. Pure v1 → Pure v2 at α=0.75
+dropped regret from 8.04e-6 to 7.36e-6 (a 9% gain) without changing
+any other knob. This matches the theoretical prediction that hash-
+conditioned candidate selection produces a mixed-strategy row in the
+empirical payoff matrix and therefore drops off the regret-generating
+zone.
+Quasi-randomness improves EF1. Pure v1 → Pure v2 at α=0.75 lifted
+EF1 from 9.21 to 12.15. The neutral swap mechanism produces more
+balanced bundles, which is what EF1 rewards.
+Gemini 2.0 Flash makes essentially no difference. Pure v1 →
+Pure v1 + Gemini moved regret by +0.04e-6 (within noise). The LLM is
+either not reaching the model often enough, or the model is too weak
+to refine these proposals usefully.
 
-**Medium confidence.**
+Medium confidence.
 
-- *At α=0.75, Claude Sonnet improves regret slightly but hurts NWA
-  significantly.* Pure v2 → Sonnet v2 at α=0.75 dropped regret 7.36e-6
-  → 6.88e-6 (7% gain) but crashed NWA from 31.59 to 22.43 (29% loss).
-  The likely mechanism: Sonnet softens proposals toward more
-  equitable splits, which pleases the equilibrium support but pushes
-  self-payoff closer to BATNA, hurting the surplus-over-BATNA geometric
-  mean in NWA.
-- *At α=0.80, Claude Sonnet is genuinely doing work that the heuristic
-  cannot.* Pure v2 (α=0.80) at 9.33e-6 vs Sonnet v2 (α=0.80) at 4.52e-6.
-  The deterministic spine at α=0.80 is over-aggressive, and Sonnet pulls
-  proposals back into a productive zone. The α + LLM combination is
-  doing better than either component alone.
+At α=0.75, Claude Sonnet improves regret slightly but hurts NWA
+significantly. Pure v2 → Sonnet v2 at α=0.75 dropped regret 7.36e-6
+→ 6.88e-6 (7% gain) but crashed NWA from 31.59 to 22.43 (29% loss).
+The likely mechanism: Sonnet softens proposals toward more
+equitable splits, which pleases the equilibrium support but pushes
+self-payoff closer to BATNA, hurting the surplus-over-BATNA geometric
+mean in NWA.
+At α=0.80, Claude Sonnet is genuinely doing work that the heuristic
+cannot. Pure v2 (α=0.80) at 9.33e-6 vs Sonnet v2 (α=0.80) at 4.52e-6.
+The deterministic spine at α=0.80 is over-aggressive, and Sonnet pulls
+proposals back into a productive zone. The α + LLM combination is
+doing better than either component alone.
 
-**Low confidence / open questions.**
+Low confidence / open questions.
 
-- *Is Sonnet v2 (α=0.80) at 4.5e-6 stable, or is some of it noise?* We
-  have one run at this exact config. The bootstrap SE on a single
-  benchmark run is around 2e-5, which is larger than our mean. A stability
-  run is recommended before claiming the number with confidence.
-- *Would Gemini 3.1 Pro perform like Sonnet at α=0.80?* The Gemini 2.0
-  Flash run was too weak to be a useful comparison. A reasoning-tier
-  Gemini (e.g. Gemini 2.5 Pro or 3.x Pro) would be informative.
+Is Sonnet v2 (α=0.80) at 4.5e-6 stable, or is some of it noise? We
+have one run at this exact config. The bootstrap SE on a single
+benchmark run is around 2e-5, which is larger than our mean. A stability
+run is recommended before claiming the number with confidence.
+Would Gemini 3.1 Pro perform like Sonnet at α=0.80? The Gemini 2.0
+Flash run was too weak to be a useful comparison. A reasoning-tier
+Gemini (e.g. Gemini 2.5 Pro or 3.x Pro) would be informative.
+
+What the propose-path and decide-path do, separately
+We isolated the LLM's contribution by gating it to one action type at a
+time (LLM_PROPOSE_ENABLED / LLM_DECIDE_ENABLED). 
+
+High confidence.
+
+The two paths optimise for different metrics. Decide-only gives
+large welfare gains (NWA +8.75, EF1 +4.82, NW +5.74 over the pure
+spine) with only modest regret movement. Propose-only gives a smaller
+regret gain (−1.75e-6 vs pure) and worse NWA. They are not
+interchangeable knobs.
+Path effects are non-additive on regret. Propose-only saves
+1.75e-6 of regret; decide-only saves 0.95e-6. Independent additive
+effects would predict ~2.70e-6 of joint saving, giving regret around
+6.6e-6. The measured joint config (Sonnet both) hits 4.52e-6 — a
+saving of 4.81e-6. The two paths interact synergistically; whatever
+the LLM does on decide makes propose-path refinements more effective
+than they are alone.
+Stronger model amplifies each path's character, not its direction.
+Opus 4.7 decide-only (regret 8.94e-6, NWA 36.60) shows the same
+decide-path signature as Sonnet decide-only (regret 8.38e-6, NWA
+34.27): high welfare, modest regret movement, EF1 lift. Model
+strength looks like a gain knob on the existing pattern rather than
+a change in which path does what.
+
+Medium confidence.
+
+The propose path is the regret driver and the welfare killer.
+Propose-only's NWA (22.83) is below the pure spine's (25.52),
+suggesting LLM-modified proposals leave less surplus on the
+opponent's side. The matching regret gain (−1.75e-6) suggests this
+is the exchange the LLM is making: regret reduction at the cost of
+surplus geometry.
+The decide path is the welfare driver and a small regret helper.
+Decide-only lifts every welfare metric and also nudges regret down
+modestly. This is consistent with the LLM rejecting marginal offers
+the deterministic accept-rule would have taken (or vice versa), in
+ways that close more high-surplus deals.
+Pareto fronts exist; there is no single "best" config. The
+shipping config (Sonnet both at α=0.80) leads MENE regret. Opus
+decide-only would plausibly lead NWA and EF1 simultaneously, at the
+cost of regret roughly doubling. The benchmark scores each metric
+independently, so the choice is a positioning question, not an
+optimisation one.
+
+Low confidence / open.
+
+We do not know what the LLM actually changes on the propose path.
+We hypothesise it pulls aggressive α=0.80 baselines back toward
+deal-closing zones, but we have no per-call logging of which
+proposals were modified vs preserved. Adding that logging is small
+work and would expose the actual modification pattern.
+The Opus-both run (LLM on both paths) is not yet measured. By
+analogy to Sonnet, it should give the lowest regret of any config
+we have run, possibly substantially below 4.52e-6 — but at unknown
+NWA cost.
+Run-to-run variability is unstudied for the asymmetric configs.
+Each Path A measurement is a single run; the bootstrap SE on
+regret is large enough that point comparisons should be treated as
+directional rather than precise.
+
 
 ### Open questions worth studying
 
