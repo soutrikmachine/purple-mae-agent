@@ -166,14 +166,10 @@ def main() -> None:
     model = os.environ.get("LLM_MODEL", "anthropic/claude-opus-4.7")
     opening_aggro = os.environ.get("OPENING_AGGRESSIVENESS", "0.80")
     # Path A path-specific gates (default to USE_LLM if unset).
-    # Same parser as llm.py: empty string ("") means "inherit USE_LLM".
-    def _path_flag(name: str, default: bool) -> bool:
-        raw = os.environ.get(name, "")
-        if raw == "":
-            return default
-        return raw.strip().lower() in ("1", "true", "yes")
-    llm_propose = _path_flag("LLM_PROPOSE_ENABLED", use_llm)
-    llm_decide = _path_flag("LLM_DECIDE_ENABLED", use_llm)
+    llm_propose_raw = os.environ.get("LLM_PROPOSE_ENABLED", str(use_llm).lower())
+    llm_decide_raw = os.environ.get("LLM_DECIDE_ENABLED", str(use_llm).lower())
+    llm_propose = llm_propose_raw.lower() in ("1", "true", "yes")
+    llm_decide = llm_decide_raw.lower() in ("1", "true", "yes")
     if use_llm:
         key_env = "OPENROUTER_API_KEY" if provider == "openrouter" else "ANTHROPIC_API_KEY"
         if not os.environ.get(key_env):
