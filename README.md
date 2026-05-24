@@ -366,9 +366,9 @@ executed during development, not predictions. Submitted via Amber to
 | Sonnet v2 (1) | 0.75 | Sonnet 4.6 | v2 + LLM refinement |
 | Sonnet v2 (2) | 0.80 | Sonnet 4.6 | v2 + LLM, more aggressive opening |
 | Opus v2 (1) | 0.80 | Opus 4.7 | v2+ LLM, comparing LLM reasoning ability with pure game theoretic setting |
-| Sonnet_Decide v2 (3) | 0.80 | Sonnet 4.6 | v2+LLM as decider only |
-| Opus_Decide v2 (2) | 0.80 | Opus 4.7 | v2+LLM as decider only, compare with Sonnet |
-| Sonnet_Propose v2 (4) | 0.80 | Sonnet 4.6 | v2+ LLM as propose only |
+| Sonnet_Decide v2 (3) | 0.80 | Sonnet 4.6 | v2+LLM as decider only, cost effective, <= $0.5 |
+| Opus_Decide v2 (2) | 0.80 | Opus 4.7 | v2+LLM as decider only, compare with Sonnet, cost effective, <=$0.5 |
+| Sonnet_Propose v2 (4) | 0.80 | Sonnet 4.6 | v2+ LLM as propose only. cost effective |
 | Pure v2 (α=0.80) | 0.80 | off | v2 deterministic, more aggressive opening |
 
 ### Headline numbers
@@ -382,7 +382,7 @@ executed during development, not predictions. Submitted via Amber to
 | **Sonnet v2 (α=0.80)** | **4.515e-6** ⭐ | 13.67 | 67.81 | 24.03 | **82.11** |
 | Opus v2 (α=0.80) | Value | Value | Value | Value | Value |
 | **Sonnet_Decide v2 (α=0.80)** | 8.38e-6 | 16.16 | 69.34 | **34.27** ⭐ | 81.30 |
-| Opus_Decide v2 (α=0.80) | Value | Value | Value | Value | Value |
+| **Opus_Decide v2 (α=0.80)** | 8.94e-6 | **19.85** | **71.66** | **36.6** ⭐ | 80.9 |
 | Sonnet_Propose (α=0.80) | 7.58e-6 | 12.47 | 70.73 | 22.83 | **82.99** |
 | Pure v2 (α=0.80) | 9.329e-6 | 11.34 | 63.61 | 25.52 | 79.13 |
 
