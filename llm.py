@@ -51,7 +51,7 @@ LLM_DECIDE_ENABLED = _path_flag("LLM_DECIDE_ENABLED", USE_LLM)
 PROVIDER = os.environ.get("LLM_PROVIDER", "openrouter").lower()
 MODEL = os.environ.get(
     "LLM_MODEL",
-    "anthropic/claude-opus-4.7" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
+    "openai/gpt-5.5" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
 )
 TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "15"))
 MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "512"))
