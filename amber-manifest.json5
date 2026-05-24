@@ -23,7 +23,7 @@
       "USE_LLM": "true",
       "LLM_PROVIDER": "openrouter",
       "LLM_MODEL": "anthropic/claude-opus-4.7",
-      "LLM_TIMEOUT_S": "45",
+      "LLM_TIMEOUT_S": "15",
       "OPENROUTER_API_KEY": "${config.openrouter_api_key}",
 
       // --- Path A: asymmetric LLM gating ---
