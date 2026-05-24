@@ -460,11 +460,10 @@ that warrant proper investigation in future work.
    lower (less computational overhead per turn). To test: sweep K over
    {2, 4, 6, 12, 24} using a local harness.
 
-4. **Does the LLM contribute on the propose path, the decide path, or
-   both?** We never isolated the two. Sonnet's contribution at α=0.80
-   could be entirely on propose, entirely on decide, or split. To test:
-   run with LLM_PROPOSE_ENABLED on/off and LLM_DECIDE_ENABLED on/off
-   independently.
+4. **How the LLM contributes on the propose path, the decide path, or
+   both?** We isolated the two. LLM as decider has obtained high Nash Welfare
+   Advantage comparing to LLM as proposed only. Other metrics are within a range,
+   including the MENE regret. 
 
 5. **How sensitive is regret to the SHA-256 seed function specifically?**
    The hash includes (pair, game_index, round, valuations, quantities,
