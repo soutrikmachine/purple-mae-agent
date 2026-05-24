@@ -30,8 +30,8 @@ MODEL = os.environ.get(
     "LLM_MODEL",
     "openai/gpt-5.5" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
 )
-TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "15"))
-MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "512"))
+TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "45"))
+MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "2048"))
 
 
 _SYSTEM_PROMPT = """You are a strategic advisor for a bargaining agent.

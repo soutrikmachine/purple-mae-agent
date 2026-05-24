@@ -23,7 +23,7 @@
       "USE_LLM": "true",
       "LLM_PROVIDER": "openrouter",
       "LLM_MODEL": "openai/gpt-5.5",
-      "LLM_TIMEOUT_S": "15",
+      "LLM_TIMEOUT_S": "45",
       "OPENROUTER_API_KEY": "${config.openrouter_api_key}",
 
       // --- RL refinement (optional, advanced) ---
