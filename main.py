@@ -164,7 +164,7 @@ def main() -> None:
     use_rl = os.environ.get("USE_RL", "false").lower() in ("1", "true", "yes")
     provider = os.environ.get("LLM_PROVIDER", "openrouter")
     model = os.environ.get("LLM_MODEL", "openai/gpt-5.5")
-    opening_aggro = os.environ.get("OPENING_AGGRESSIVENESS", "0.75")
+    opening_aggro = os.environ.get("OPENING_AGGRESSIVENESS", "0.80")
     if use_llm:
         key_env = "OPENROUTER_API_KEY" if provider == "openrouter" else "ANTHROPIC_API_KEY"
         if not os.environ.get(key_env):
