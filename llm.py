@@ -28,7 +28,7 @@ USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("1", "true", "yes")
 PROVIDER = os.environ.get("LLM_PROVIDER", "openrouter").lower()
 MODEL = os.environ.get(
     "LLM_MODEL",
-    "openai/gpt-5.5" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
+    "anthropic/claude-opus-4.7" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
 )
 TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "45"))
 MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "2048"))
