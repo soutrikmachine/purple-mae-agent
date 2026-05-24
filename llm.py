@@ -25,29 +25,6 @@ from strategy import GameState
 logger = logging.getLogger("purple_mae.llm")
 
 USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("1", "true", "yes")
-
-
-def _path_flag(env_name: str, default: bool) -> bool:
-    """
-    Parse an LLM path-gate env var.
-
-    Returns `default` if the env var is unset OR set to the empty string.
-    This matches the documented intent ("leave blank to inherit USE_LLM"),
-    which a naive `os.environ.get(name, str(default))` does NOT honour:
-    when Amber materialises a manifest, "" is a *present* empty value, not
-    an unset key.
-    """
-    raw = os.environ.get(env_name, "")
-    if raw == "":
-        return default
-    return raw.strip().lower() in ("1", "true", "yes")
-
-
-# Path A (asymmetric LLM use): individually gate the propose and decide
-# paths. Each defaults to USE_LLM, so existing configs are unchanged. To
-# isolate the LLM's contribution to one path, set the other to "false".
-LLM_PROPOSE_ENABLED = _path_flag("LLM_PROPOSE_ENABLED", USE_LLM)
-LLM_DECIDE_ENABLED = _path_flag("LLM_DECIDE_ENABLED", USE_LLM)
 PROVIDER = os.environ.get("LLM_PROVIDER", "openrouter").lower()
 MODEL = os.environ.get(
     "LLM_MODEL",
@@ -165,9 +142,7 @@ def refine_proposal(
     baseline_other: list[int],
     baseline_reason: str,
 ) -> tuple[list[int], list[int], str]:
-    # Path A asymmetric gate: skip the LLM call entirely if the propose
-    # path is disabled, even when USE_LLM=true.
-    if not (USE_LLM and LLM_PROPOSE_ENABLED):
+    if not USE_LLM:
         return baseline_self, baseline_other, baseline_reason
 
     parsed = _chat({
@@ -195,8 +170,7 @@ def refine_decision(
     baseline_reason: str,
     offer_value_override: float | None = None,
 ) -> tuple[bool, str]:
-    # Path A asymmetric gate.
-    if not (USE_LLM and LLM_DECIDE_ENABLED):
+    if not USE_LLM:
         return baseline_accept, baseline_reason
 
     parsed = _chat({
