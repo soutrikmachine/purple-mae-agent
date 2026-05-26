@@ -25,13 +25,22 @@ from strategy import GameState
 logger = logging.getLogger("purple_mae.llm")
 
 USE_LLM = os.environ.get("USE_LLM", "false").lower() in ("1", "true", "yes")
+# Path A (asymmetric LLM use): individually gate the propose and decide
+# paths. Each defaults to USE_LLM, so existing configs are unchanged. To
+# isolate the LLM's contribution to one path, set the other to "false".
+LLM_PROPOSE_ENABLED = os.environ.get(
+    "LLM_PROPOSE_ENABLED", str(USE_LLM).lower()
+).lower() in ("1", "true", "yes")
+LLM_DECIDE_ENABLED = os.environ.get(
+    "LLM_DECIDE_ENABLED", str(USE_LLM).lower()
+).lower() in ("1", "true", "yes")
 PROVIDER = os.environ.get("LLM_PROVIDER", "openrouter").lower()
 MODEL = os.environ.get(
     "LLM_MODEL",
-    "anthropic/claude-sonnet-4.6" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
+    "anthropic/claude-opus-4.7" if PROVIDER == "openrouter" else "claude-sonnet-4-20250514",
 )
-TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "15"))
-MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "512"))
+TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "45"))
+MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "1024"))
 
 
 _SYSTEM_PROMPT = """You are a strategic advisor for a bargaining agent.
@@ -142,7 +151,9 @@ def refine_proposal(
     baseline_other: list[int],
     baseline_reason: str,
 ) -> tuple[list[int], list[int], str]:
-    if not USE_LLM:
+    # Path A asymmetric gate: skip the LLM call entirely if the propose
+    # path is disabled, even when USE_LLM=true.
+    if not (USE_LLM and LLM_PROPOSE_ENABLED):
         return baseline_self, baseline_other, baseline_reason
 
     parsed = _chat({
@@ -170,7 +181,8 @@ def refine_decision(
     baseline_reason: str,
     offer_value_override: float | None = None,
 ) -> tuple[bool, str]:
-    if not USE_LLM:
+    # Path A asymmetric gate.
+    if not (USE_LLM and LLM_DECIDE_ENABLED):
         return baseline_accept, baseline_reason
 
     parsed = _chat({
